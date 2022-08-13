@@ -1,0 +1,36 @@
+@import url("https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500&family=Gloria+Hallelujah&family=Montserrat:wght@400;800;900&display=swap");
+:root {
+  --font-numbers: "Azeret Mono", monospace;
+  --font-titles: "Montserrat", sans-serif;
+  --font-accent: "Gloria Hallelujah", cursive;
+  --c-bg-900: #2e3440;
+  --c-bg-800: #3b4252;
+  --c-bg-700: #434c5e;
+  --c-bg-600: #4c566a;
+  --c-fg-100: #eceff4;
+  --c-fg-200: #e5e9f0;
+  --c-fg-300: #d8dee9;
+  --c-green: #8fbcbb;
+  --c-cyan: #88c0d0;
+  --c-blue-light: #81a1c1;
+  --c-blue-dark: #5e81ac;
+  --c-red: #bf616a;
+  --c-orange: #d08770;
+  --c-yellow: #ebcb8b;
+  --c-green: #a3be8c;
+  --c-purple: #b48ead;
+}
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-titles);
+}
+
+body {
+  background: var(--c-bg-900);
+  color: var(--c-fg-100);
+}
