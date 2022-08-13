@@ -90,6 +90,8 @@ section {
 
 .last-row {
   margin-bottom: 0;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .operators-container {
@@ -108,7 +110,7 @@ section {
   background-color: var(--c-cyan);
   color: var(--c-bg-900);
   border: 0;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
 }
 
 .zero {
