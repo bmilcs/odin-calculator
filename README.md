@@ -5,6 +5,10 @@ Welcome to Bryan Miller's Calculator Project, the [fifth assignment](https://www
 - HTML
 - CSS
 - JavaScript
+  - Objects & Arrays
+  - Methods
+  - Constructors
+  - Switches
 - Chrome DevTools & Debugging
 - Git Fundamentals
 
