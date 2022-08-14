@@ -42,6 +42,9 @@ numberBtns.forEach((button) => {
     }
 
     // Decimal place handling
+    if (numberPressed === "." && numberOnScreen.match(".")) {
+      updateScreen(numberOnScreen.replace(".", ""));
+    }
 
     // Update global var + display updated # to calc screen
     numberOnScreen += numberPressed;
