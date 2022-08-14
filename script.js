@@ -21,7 +21,7 @@ let lastActionWasEqual;
 // EventListeners
 //
 
-// Number Buttons: 0-9 .
+// Number Button Events: 0-9 .
 
 numberBtns.forEach((button) => {
   button.addEventListener("click", (e) => {
@@ -44,12 +44,14 @@ numberBtns.forEach((button) => {
     // Update global var + display updated # to calc screen
     numberOnScreen += numberPressed;
     display.textContent = numberOnScreen;
-    console.log(currentCalc);
-    console.table(calcHistory);
+    // console.log(currentCalc);
+    // console.table(calcHistory);
   });
 });
 
-// Operator Buttons: * + / - = C
+//
+// Operator Button Events: * + / - = C
+//
 
 operatorBtns.forEach((button) => {
   button.addEventListener("click", (e) => {
@@ -77,7 +79,8 @@ operatorBtns.forEach((button) => {
       operatorPressed === "multiply" ||
       operatorPressed === "divide" ||
       operatorPressed === "subtract" ||
-      operatorPressed === "add"
+      operatorPressed === "add" ||
+      operatorPressed === "modulus"
     ) {
       // Override pressing equal & then a number functionality (clears history/screen)
       lastActionWasEqual = 0;
@@ -109,7 +112,9 @@ operatorBtns.forEach((button) => {
   });
 });
 
+//
 // Perform calculation function
+//
 
 function doCalculation() {
   currentCalc.operate();
@@ -120,7 +125,7 @@ function doCalculation() {
   numberOnScreen = currentCalc.answer;
 
   calcHistory.push(currentCalc);
-  currentCalc = "";
+  // currentCalc = "";
   currentCalc = new expression("", numberOnScreen);
 }
 
@@ -153,6 +158,9 @@ function expression(operator, num1, num2) {
         break;
       case "add":
         this.sign = "+";
+        break;
+      case "modulus":
+        this.sign = "%";
         break;
       default:
         break;
@@ -195,4 +203,8 @@ function multiply(x, y) {
 
 function divide(x, y) {
   return x / y;
+}
+
+function modulus(x, y) {
+  return x % y;
 }
