@@ -64,7 +64,8 @@ section {
   border-radius: 1rem;
 }
 
-.calculation-bar {
+.display,
+.history {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -73,9 +74,16 @@ section {
   font-size: 1.25rem;
   background-color: var(--c-green);
   margin-bottom: 1rem;
-  border-radius: 1rem;
   color: var(--c-bg-900);
   font-weight: bold;
+}
+.display {
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+.history {
+  border-radius: 0.5rem 0.5rem 0 0;
+  margin-bottom: 0;
+  color: var(--c-bg-600);
 }
 
 .first-row {
