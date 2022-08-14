@@ -33,7 +33,6 @@ numberBtns.forEach((button) => {
     if (lastActionWasOperator === 1) {
       clearScreen();
       lastActionWasOperator = 0;
-      // history.textContent = `${currentCalc.num1} ${currentCalc.sign}`;
     }
 
     // If last button was equals & a number is pressed
@@ -62,14 +61,13 @@ operatorBtns.forEach((button) => {
     // Grab current data from calc display & operator button pressed
     const operatorPressed = e.target.getAttribute("data-value");
     numberOnScreen = display.textContent;
-    console.log(operatorPressed);
 
     if (operatorPressed === "clear") {
       clearAll(); // Clear history array & calc object
     } else if (operatorPressed === "plusminus") {
       togglePlusMinus(); // Toggle negative/positive number
     } else if (operatorPressed === "equal") {
-      // if currentCalc contains an operator, num1 is a number & there's a number is on the calc display
+      // if currentCalc contains an operator & a num1 & there's a number is on the calc display
       if (
         currentCalc.operator &&
         currentCalc.num1 !== "NaN" &&
@@ -88,20 +86,20 @@ operatorBtns.forEach((button) => {
       operatorPressed === "add" ||
       operatorPressed === "modulus"
     ) {
-      // Override pressing equal & then a number functionality (clears history/screen)
+      // Override pressing equal & then a number (clears history/screen)
       lastActionWasEqual = 0;
 
       if (lastActionWasOperator) {
         // if last press was an operator, update the object w/ new operator
-        currentCalc.updateSign(operatorPressed);
+        currentCalc.updateOperator(operatorPressed);
       } else if (currentCalc.operator && currentCalc.num1) {
         // If current calc contains an operator & num1, perform calculation
         currentCalc.num2 = +numberOnScreen;
         clearScreen();
         doCalculation();
-        currentCalc.updateSign(operatorPressed);
+        currentCalc.updateOperator(operatorPressed);
       } else if (currentCalc.num1) {
-        currentCalc.updateSign(operatorPressed);
+        currentCalc.updateOperator(operatorPressed);
       } else {
         // Create new calculation
         currentCalc = new expression(operatorPressed, numberOnScreen);
@@ -137,12 +135,13 @@ function expression(operator, num1, num2) {
 
   // operate method
   this.operate = function () {
+    if (this.operator === "divide" && this.num2 === 0) return 1;
     this.answer = roundNumber(window[this.operator](this.num1, this.num2), 5);
-    this.updateSign();
+    this.updateOperator();
   };
 
   // convert operator to word to symbol for history display
-  this.updateSign = function (operator = this.operator) {
+  this.updateOperator = function (operator = this.operator) {
     this.operator = operator;
     switch (this.operator) {
       case "multiply":
@@ -166,7 +165,7 @@ function expression(operator, num1, num2) {
   };
 
   // on creation, update sign
-  this.updateSign();
+  this.updateOperator();
 }
 
 //
