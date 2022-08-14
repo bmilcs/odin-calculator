@@ -6,8 +6,9 @@
 
 const numberBtns = Array.from(document.querySelectorAll(".btn.number"));
 const operatorBtns = Array.from(document.querySelectorAll(".btn.operator"));
-const display = document.getElementsByClassName("display")[0];
-const history = document.getElementsByClassName("history")[0];
+const display = document.querySelector(".display");
+const history = document.querySelector(".history.one");
+const history2 = document.querySelector(".history.two");
 
 // Global Variables
 
@@ -33,6 +34,7 @@ numberBtns.forEach((button) => {
     if (lastActionWasOperator === 1) {
       clearScreen();
       lastActionWasOperator = 0;
+      // history.textContent = `${currentCalc.num1} ${currentCalc.sign}`;
     }
 
     // If last button was equals & a number is pressed
@@ -92,19 +94,19 @@ operatorBtns.forEach((button) => {
 
       if (lastActionWasOperator) {
         // if last press was an operator, update the object w/ new operator
-        currentCalc.operator = operatorPressed;
+        currentCalc.updateSign(operatorPressed);
       } else if (currentCalc.operator && currentCalc.num1) {
         // If current calc contains an operator & num1, perform calculation
-        console.log("Operator & Num1 exist");
         currentCalc.num2 = +numberOnScreen;
         clearScreen();
         doCalculation();
-        currentCalc.operator = operatorPressed;
+        currentCalc.updateSign(operatorPressed);
       } else if (currentCalc.num1) {
-        currentCalc.operator = operatorPressed;
+        currentCalc.updateSign(operatorPressed);
       } else {
         // Create new calculation
         currentCalc = new expression(operatorPressed, numberOnScreen);
+        history.textContent = `${currentCalc.num1} ${currentCalc.sign} `;
       }
 
       // Notify number buttons of last action
@@ -120,9 +122,7 @@ operatorBtns.forEach((button) => {
 function doCalculation() {
   currentCalc.operate();
   updateScreen(currentCalc.answer);
-  history.textContent = `${currentCalc.num1} ${currentCalc.sign} ${currentCalc.num2} =`;
-  numberOnScreen = currentCalc.answer;
-
+  history.textContent = `${currentCalc.num1} ${currentCalc.sign} ${currentCalc.num2} = ${currentCalc.answer}`;
   calcHistory.push(currentCalc);
   currentCalc = new expression("", numberOnScreen);
 }
@@ -143,7 +143,8 @@ function expression(operator, num1, num2) {
   };
 
   // convert operator to word to symbol for history display
-  this.updateSign = function () {
+  this.updateSign = function (operator = this.operator) {
+    this.operator = operator;
     switch (this.operator) {
       case "multiply":
         this.sign = "x";
