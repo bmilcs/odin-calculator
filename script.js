@@ -8,7 +8,6 @@ const numberBtns = Array.from(document.querySelectorAll(".btn.number"));
 const operatorBtns = Array.from(document.querySelectorAll(".btn.operator"));
 const display = document.querySelector(".display");
 const history = document.querySelector(".history.one");
-const history2 = document.querySelector(".history.two");
 
 // Global Variables
 
@@ -138,7 +137,7 @@ function expression(operator, num1, num2) {
 
   // operate method
   this.operate = function () {
-    this.answer = window[this.operator](this.num1, this.num2);
+    this.answer = roundNumber(window[this.operator](this.num1, this.num2), 5);
     this.updateSign();
   };
 
@@ -205,6 +204,15 @@ function clearAll() {
 function clearScreen() {
   numberOnScreen = "";
   display.textContent = "";
+}
+
+//
+// Rounding Function w/o Trailing Zeros
+//
+
+function roundNumber(number, decimalPlaces) {
+  const x = Math.pow(10, decimalPlaces);
+  return Math.round(number * x) / x;
 }
 
 //
