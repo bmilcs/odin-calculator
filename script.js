@@ -41,11 +41,11 @@ numberBtns.forEach((button) => {
       lastActionWasEqual = 0;
     }
 
+    // Decimal place handling
+
     // Update global var + display updated # to calc screen
     numberOnScreen += numberPressed;
     display.textContent = numberOnScreen;
-    // console.log(currentCalc);
-    // console.table(calcHistory);
   });
 });
 
@@ -62,6 +62,8 @@ operatorBtns.forEach((button) => {
 
     if (operatorPressed === "clear") {
       clearAll(); // Clear history array & calc object
+    } else if (operatorPressed === "plusminus") {
+      togglePlusMinus(); // Toggle negative/positive number
     } else if (operatorPressed === "equal") {
       // if currentCalc contains an operator, num1 is a number & there's a number is on the calc display
       if (
@@ -85,12 +87,11 @@ operatorBtns.forEach((button) => {
       // Override pressing equal & then a number functionality (clears history/screen)
       lastActionWasEqual = 0;
 
-      // if last press was an operator, update the object w/ new operator
       if (lastActionWasOperator) {
+        // if last press was an operator, update the object w/ new operator
         currentCalc.operator = operatorPressed;
-
-        // If current calc contains an operator & num1, perform calculation
       } else if (currentCalc.operator && currentCalc.num1) {
+        // If current calc contains an operator & num1, perform calculation
         console.log("Operator & Num1 exist");
         currentCalc.num2 = +numberOnScreen;
         clearScreen();
@@ -106,9 +107,6 @@ operatorBtns.forEach((button) => {
       // Notify number buttons of last action
       lastActionWasOperator = 1;
     }
-
-    // console.table(calcHistory);
-    // console.table(currentCalc);
   });
 });
 
@@ -118,14 +116,11 @@ operatorBtns.forEach((button) => {
 
 function doCalculation() {
   currentCalc.operate();
-  currentCalc.updateSign();
-
-  display.textContent = currentCalc.answer;
+  updateScreen(currentCalc.answer);
   history.textContent = `${currentCalc.num1} ${currentCalc.sign} ${currentCalc.num2} =`;
   numberOnScreen = currentCalc.answer;
 
   calcHistory.push(currentCalc);
-  // currentCalc = "";
   currentCalc = new expression("", numberOnScreen);
 }
 
@@ -172,6 +167,27 @@ function expression(operator, num1, num2) {
 }
 
 //
+// Toggle Plus Minus
+//
+
+function togglePlusMinus() {
+  if (!numberOnScreen.startsWith("-")) {
+    updateScreen("-" + numberOnScreen);
+  } else {
+    updateScreen(numberOnScreen.slice(1));
+  }
+}
+
+//
+// Update Screen Function
+//
+
+function updateScreen(content) {
+  numberOnScreen = content;
+  display.textContent = numberOnScreen;
+}
+
+//
 // Clear functions
 //
 
@@ -187,7 +203,9 @@ function clearScreen() {
   display.textContent = "";
 }
 
-// basic math function operators
+//
+// Basic math functions
+//
 
 function add(x, y) {
   return +x + +y;
