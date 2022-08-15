@@ -8,6 +8,7 @@ const numberBtns = Array.from(document.querySelectorAll(".btn.number"));
 const operatorBtns = Array.from(document.querySelectorAll(".btn.operator"));
 const display = document.querySelector(".display");
 const history = document.querySelector(".history.one");
+const history2 = document.querySelector(".history.two");
 
 // Global Variables
 
@@ -29,16 +30,19 @@ numberBtns.forEach((button) => {
     const numberPressed = e.target.getAttribute("data-value");
     numberOnScreen = display.textContent;
 
-    // Determine if last button pressed was an operator
     if (lastActionWasOperator === 1) {
-      clearScreen();
       lastActionWasOperator = 0;
+      // prevent NaN/undefined issue (operator followed by clear)
+      if (currentCalc.num1) {
+        currentCalc.generatePartialExpression();
+        updateHistory(currentCalc.expressionPartial);
+      }
+      clearScreen();
     }
 
-    // If last button was equals & a number is pressed
     if (lastActionWasEqual === 1) {
-      clearAll();
       lastActionWasEqual = 0;
+      clearAll();
     }
 
     // Decimal place handling (prevent multiple .)
@@ -47,13 +51,12 @@ numberBtns.forEach((button) => {
     }
 
     // Update global var + display updated # to calc screen
-    numberOnScreen += numberPressed;
-    display.textContent = numberOnScreen;
+    updateScreen((numberOnScreen += numberPressed));
   });
 });
 
 //
-// Operator Button Events: * + / - = C
+// Operator Button Events: * + / - = C % +-
 //
 
 operatorBtns.forEach((button) => {
@@ -62,18 +65,20 @@ operatorBtns.forEach((button) => {
     const operatorPressed = e.target.getAttribute("data-value");
     numberOnScreen = display.textContent;
 
+    operatorBtns.forEach((btn) => btn.classList.remove("btn-highlight"));
+
     if (operatorPressed === "clear") {
       clearAll(); // Clear history array & calc object
     } else if (operatorPressed === "plusminus") {
       togglePlusMinus(); // Toggle negative/positive number
+    } else if (operatorPressed === "erase") {
+      display.textContent = display.textContent.slice(0, -1);
     } else if (operatorPressed === "equal") {
-      // if currentCalc contains an operator & a num1 & there's a number is on the calc display
       if (
-        currentCalc.operator &&
         currentCalc.num1 !== "NaN" &&
+        currentCalc.operator &&
         numberOnScreen
       ) {
-        // push number on screen to num2 & do calculation
         currentCalc.num2 = +numberOnScreen;
         doCalculation();
         lastActionWasOperator = 1;
@@ -86,27 +91,28 @@ operatorBtns.forEach((button) => {
       operatorPressed === "add" ||
       operatorPressed === "modulus"
     ) {
-      // Override pressing equal & then a number (clears history/screen)
-      lastActionWasEqual = 0;
-
-      if (lastActionWasOperator) {
-        // if last press was an operator, update the object w/ new operator
+      console.log(currentCalc.num1);
+      console.log(display.textContent);
+      if (currentCalc.num1 === "NaN") {
+        console.log("fail");
+      } else if (lastActionWasOperator) {
         currentCalc.updateOperator(operatorPressed);
       } else if (currentCalc.operator && currentCalc.num1) {
-        // If current calc contains an operator & num1, perform calculation
         currentCalc.num2 = +numberOnScreen;
         clearScreen();
         doCalculation();
-        currentCalc.updateOperator(operatorPressed);
-      } else if (currentCalc.num1) {
+        // ^ clears currentCalc. therefore:
         currentCalc.updateOperator(operatorPressed);
       } else {
-        // Create new calculation
+        // create new calculation
         currentCalc = new expression(operatorPressed, numberOnScreen);
-        history.textContent = `${currentCalc.num1} ${currentCalc.sign} `;
+        // history.textContent = `${currentCalc.num1} ${currentCalc.sign} `;
+        currentCalc.generatePartialExpression();
+        updateHistory(currentCalc.expressionPartial);
       }
 
-      // Notify number buttons of last action
+      e.target.classList.add("btn-highlight");
+      lastActionWasEqual = 0;
       lastActionWasOperator = 1;
     }
   });
@@ -119,7 +125,7 @@ operatorBtns.forEach((button) => {
 function doCalculation() {
   currentCalc.operate();
   updateScreen(currentCalc.answer);
-  history.textContent = `${currentCalc.num1} ${currentCalc.sign} ${currentCalc.num2} = ${currentCalc.answer}`;
+  updateHistory(currentCalc.expression);
   calcHistory.push(currentCalc);
   currentCalc = new expression("", numberOnScreen);
 }
@@ -135,12 +141,27 @@ function expression(operator, num1, num2) {
 
   // operate method
   this.operate = function () {
-    if (this.operator === "divide" && this.num2 === 0) return 1;
+    if (this.operator === "divide" && this.num2 === 0) {
+      clearScreen();
+      return;
+    }
     this.answer = roundNumber(window[this.operator](this.num1, this.num2), 5);
     this.updateOperator();
+    this.generateFullExpression();
+    console.table(this);
   };
 
-  // convert operator to word to symbol for history display
+  this.generatePartialExpression = function () {
+    this.expressionPartial = `${this.num1} ${this.sign}`;
+  };
+
+  // generate expression string to place in history
+  this.generateFullExpression = function () {
+    this.expression = `${this.num1} ${this.sign} ${this.num2} =`;
+    this.expressionWithAnswer = `${this.expression} ${this.answer}`;
+  };
+
+  // convert operator word to symbol for history display
   this.updateOperator = function (operator = this.operator) {
     this.operator = operator;
     switch (this.operator) {
@@ -181,12 +202,21 @@ function togglePlusMinus() {
 }
 
 //
-// Update Screen Function
+// Update Screen/History Function
 //
 
 function updateScreen(content) {
   numberOnScreen = content;
   display.textContent = numberOnScreen;
+}
+
+function updateHistory(content) {
+  // Push history upward if there is a history of calculations
+  if (calcHistory.length !== 0) {
+    history2.textContent =
+      calcHistory[calcHistory.length - 1].expressionWithAnswer;
+  }
+  history.textContent = content;
 }
 
 //
@@ -198,6 +228,7 @@ function clearAll() {
   calcHistory = [];
   clearScreen();
   history.textContent = "";
+  history2.textContent = "";
 }
 
 function clearScreen() {

@@ -60,7 +60,7 @@ section {
 .calculator {
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1rem;
   margin-inline: auto;
   margin-bottom: 3rem;
   background: var(--c-bg-600);
@@ -71,6 +71,7 @@ section {
   border-radius: 0.5rem;
   background-color: var(--c-green);
   margin-bottom: 1rem;
+  padding-block: 1rem;
 }
 
 .display,
@@ -78,20 +79,21 @@ section {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 0.5rem;
-  height: 3rem;
-  font-size: 1.25rem;
+  height: 2.25rem;
+  padding: 0.75rem;
   color: var(--c-bg-900);
   font-weight: bold;
+  font-size: 1.25rem;
 }
 
 .display {
-  font-size: 1.5rem;
-}
+  font-size: 1.75rem;
+  }
 
 .history {
   color: var(--c-bg-600);
   font-weight: 400;
+  padding-
 }
 
 .first-row {
@@ -99,6 +101,7 @@ section {
   gap: 1rem;
   justify-content: space-between;
 }
+
 .buttons-container {
   display: flex;
 }
@@ -137,19 +140,19 @@ section {
   color: var(--c-fg-100);
 }
 
+.btn.erase {
+  background-color: var(--c-red);
+}
+
+.btn-highlight,
 .btn:hover {
-  filter: brightness(125%);
+  filter: brightness(145%);
   color: var(--c-bg-800);
   transition: all 0.3s;
 }
 
 .btn.disabled {
   filter: brightness(85%);
-}
-
-.zero {
-  flex-grow: 1;
-  height: 4rem;
 }
 
 footer {
