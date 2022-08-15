@@ -88,17 +88,16 @@ section {
 
 .display {
   font-size: 1.75rem;
-  }
+}
 
 .history {
   color: var(--c-bg-600);
   font-weight: 400;
-  padding-
 }
 
 .first-row {
   display: flex;
-  gap: 1rem;
+  gap: 1;
   justify-content: space-between;
 }
 
