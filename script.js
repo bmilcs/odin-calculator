@@ -32,6 +32,7 @@ numberBtns.forEach((button) => {
 
     if (lastActionWasOperator === 1) {
       lastActionWasOperator = 0;
+
       // prevent NaN/undefined issue (operator followed by clear)
       if (currentCalc.num1) {
         currentCalc.generatePartialExpression();
@@ -80,7 +81,7 @@ operatorBtns.forEach((button) => {
         numberOnScreen
       ) {
         currentCalc.num2 = +numberOnScreen;
-        doCalculation();
+        currentCalc.operate();
         lastActionWasOperator = 1;
         lastActionWasEqual = 1;
       }
@@ -91,22 +92,18 @@ operatorBtns.forEach((button) => {
       operatorPressed === "add" ||
       operatorPressed === "modulus"
     ) {
-      console.log(currentCalc.num1);
-      console.log(display.textContent);
-      if (currentCalc.num1 === "NaN") {
-        console.log("fail");
+      // prevent operator action before a number is present
+      if (numberOnScreen === "") {
+        return;
       } else if (lastActionWasOperator) {
         currentCalc.updateOperator(operatorPressed);
       } else if (currentCalc.operator && currentCalc.num1) {
         currentCalc.num2 = +numberOnScreen;
-        clearScreen();
-        doCalculation();
-        // ^ clears currentCalc. therefore:
-        currentCalc.updateOperator(operatorPressed);
+        currentCalc.operate();
+        currentCalc.updateOperator(operatorPressed); // for new currentCalc
       } else {
         // create new calculation
         currentCalc = new expression(operatorPressed, numberOnScreen);
-        // history.textContent = `${currentCalc.num1} ${currentCalc.sign} `;
         currentCalc.generatePartialExpression();
         updateHistory(currentCalc.expressionPartial);
       }
@@ -122,16 +119,8 @@ operatorBtns.forEach((button) => {
 // Perform calculation function
 //
 
-function doCalculation() {
-  currentCalc.operate();
-  updateScreen(currentCalc.answer);
-  updateHistory(currentCalc.expression);
-  calcHistory.push(currentCalc);
-  currentCalc = new expression("", numberOnScreen);
-}
-
 //
-// Operator constructor
+// Expression constructor
 //
 
 function expression(operator, num1, num2) {
@@ -142,20 +131,24 @@ function expression(operator, num1, num2) {
   // operate method
   this.operate = function () {
     if (this.operator === "divide" && this.num2 === 0) {
-      clearScreen();
-      return;
+      return 1;
     }
     this.answer = roundNumber(window[this.operator](this.num1, this.num2), 5);
     this.updateOperator();
     this.generateFullExpression();
     console.table(this);
+    updateScreen(this.answer);
+    updateHistory(this.expression);
+    calcHistory.push(this);
+    currentCalc = new expression("", numberOnScreen);
   };
 
+  // generate expression "temporary" expression string: 55 +
   this.generatePartialExpression = function () {
     this.expressionPartial = `${this.num1} ${this.sign}`;
   };
 
-  // generate expression string to place in history
+  // generate expression string to place in history (after calculation is complete)
   this.generateFullExpression = function () {
     this.expression = `${this.num1} ${this.sign} ${this.num2} =`;
     this.expressionWithAnswer = `${this.expression} ${this.answer}`;
