@@ -12,66 +12,26 @@ const history2 = document.querySelector(".history.two");
 
 // Global Variables
 
-let calcHistory = [];
 let currentCalc = new expression();
+let calcHistory = [];
 let numberOnScreen;
 let lastActionWasOperator;
 let lastActionWasEqual;
 
 //
-// EventListeners
-//
-
-// Number Button Events: 0-9 .
-
-numberBtns.forEach((button) => {
-  button.addEventListener("click", (e) => {
-    // Grab current data from calc display & number button pressed
-    const numberPressed = e.target.getAttribute("data-value");
-    numberOnScreen = display.textContent;
-
-    if (lastActionWasOperator === 1) {
-      lastActionWasOperator = 0;
-
-      // prevent NaN/undefined issue (operator followed by clear)
-      if (currentCalc.num1) {
-        currentCalc.generatePartialExpression();
-        updateHistory(currentCalc.expressionPartial);
-      }
-      clearScreen();
-    }
-
-    if (lastActionWasEqual === 1) {
-      lastActionWasEqual = 0;
-      clearAll();
-    }
-
-    // Decimal place handling (prevent multiple .)
-    if (numberPressed === "." && numberOnScreen.match(".")) {
-      updateScreen(numberOnScreen.replace(".", ""));
-    }
-
-    // Update global var + display updated # to calc screen
-    updateScreen((numberOnScreen += numberPressed));
-  });
-});
-
-//
-// Operator Button Events: * + / - = C % +-
+// Operator Button Click Events: * + / - = C % +-
 //
 
 operatorBtns.forEach((button) => {
   button.addEventListener("click", (e) => {
-    // Grab current data from calc display & operator button pressed
     const operatorPressed = e.target.getAttribute("data-value");
     numberOnScreen = display.textContent;
-
     operatorBtns.forEach((btn) => btn.classList.remove("btn-highlight"));
 
     if (operatorPressed === "clear") {
-      clearAll(); // Clear history array & calc object
+      clearAll(); // history, display, history & display
     } else if (operatorPressed === "plusminus") {
-      togglePlusMinus(); // Toggle negative/positive number
+      togglePlusMinus();
     } else if (operatorPressed === "erase") {
       display.textContent = display.textContent.slice(0, -1);
     } else if (operatorPressed === "equal") {
@@ -80,6 +40,7 @@ operatorBtns.forEach((button) => {
         currentCalc.operator &&
         numberOnScreen
       ) {
+        // safe to perform calculation
         currentCalc.num2 = +numberOnScreen;
         currentCalc.operate();
         lastActionWasOperator = 1;
@@ -92,22 +53,23 @@ operatorBtns.forEach((button) => {
       operatorPressed === "add" ||
       operatorPressed === "modulus"
     ) {
-      // prevent operator action before a number is present
       if (numberOnScreen === "") {
+        // prevent operator action before a number is present
         return;
       } else if (lastActionWasOperator) {
         currentCalc.updateOperator(operatorPressed);
       } else if (currentCalc.operator && currentCalc.num1) {
+        // first, complete existing calculation
         currentCalc.num2 = +numberOnScreen;
         currentCalc.operate();
+        // then, push operator to new currentCalc object
         currentCalc.updateOperator(operatorPressed); // for new currentCalc
       } else {
-        // create new calculation
+        // create new calculation & display first half of expression above it
         currentCalc = new expression(operatorPressed, numberOnScreen);
         currentCalc.generatePartialExpression();
         updateHistory(currentCalc.expressionPartial);
       }
-
       e.target.classList.add("btn-highlight");
       lastActionWasEqual = 0;
       lastActionWasOperator = 1;
@@ -116,8 +78,48 @@ operatorBtns.forEach((button) => {
 });
 
 //
-// Perform calculation function
+// Number Button Click Events: 0-9 .
 //
+
+numberBtns.forEach((button) => {
+  button.addEventListener("click", (e) => {
+    const numberPressed = e.target.getAttribute("data-value");
+    numberOnScreen = display.textContent;
+
+    if (lastActionWasOperator === 1) {
+      // occurs when num1 & an operator exists
+      lastActionWasOperator = 0;
+
+      if (currentCalc.num1) {
+        // prevent NaN/undefined issue, caused by choosing
+        // an operator & immediately clearing afterward
+        currentCalc.generatePartialExpression();
+        updateHistory(currentCalc.expressionPartial);
+      }
+
+      clearScreen();
+    }
+
+    if (lastActionWasEqual === 1) {
+      // occurs if a user isn't chaining multiple calculations together
+      lastActionWasEqual = 0;
+      clearAll();
+    }
+
+    // prevent multiple prefixing zero's (0001, 000302)
+    if (numberPressed === "0" && numberOnScreen.match(/^0$/g)) return;
+
+    // prevent prefixing zero if a decimal isn't present after it
+    if (numberOnScreen.match(/^0$/g) && numberPressed !== ".") updateScreen("");
+
+    // prevent multiple decimal dots in a single number
+    if (numberPressed === "." && numberOnScreen.match("."))
+      updateScreen(numberOnScreen.replace(".", ""));
+
+    // update global var + display updated # to calc screen
+    updateScreen((numberOnScreen += numberPressed));
+  });
+});
 
 //
 // Expression constructor
@@ -204,7 +206,7 @@ function updateScreen(content) {
 }
 
 function updateHistory(content) {
-  // Push history upward if there is a history of calculations
+  // move history to history2 div if this is a consecutive calculation
   if (calcHistory.length !== 0) {
     history2.textContent =
       calcHistory[calcHistory.length - 1].expressionWithAnswer;
