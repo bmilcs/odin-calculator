@@ -24,44 +24,29 @@ let lastActionWasEqual;
 
 window.addEventListener("keyup", (e) => {
   const keyPressed = e.key || e.keyCode;
-  let operatorPressed;
 
-  console.log(keyPressed);
   if (keyPressed.match(/[\d.]/)) {
     numberFunction(keyPressed);
-  } else if (keyPressed === "-") operatorPressed = "subtract";
-  else if (keyPressed === "+") operatorPressed = "add";
-  else if (keyPressed === "Enter") operatorPressed = "equal";
-  else if (keyPressed === "/") operatorPressed = "divide";
-  else if (keyPressed === "*") operatorPressed = "multiply";
-  else if (keyPressed === "%") operatorPressed = "modulus";
-  else if (keyPressed === " ") operatorPressed = "clear";
-  else if (keyPressed === "Backspace") operatorPressed = "erase";
+  } else if (keyPressed === "-") operatorFunction("subtract");
+  else if (keyPressed === "+") operatorFunction("add");
+  else if (keyPressed === "Enter") operatorFunction("equal");
+  else if (keyPressed === "/") operatorFunction("divide");
+  else if (keyPressed === "*") operatorFunction("multiply");
+  else if (keyPressed === "%") operatorFunction("modulus");
+  else if (keyPressed === " " || keyPressed === "c") operatorFunction("clear");
+  else if (keyPressed === "Backspace") operatorFunction("erase");
   else if (keyPressed === "=" || keyPressed === "enter")
-    operatorPressed = "equal";
-
-  if (operatorPressed) operatorFunction(operatorPressed);
+    operatorFunction("equal");
 });
 
 //
 // Operator Buttons
 //
 
-// Click Events: * + / - = C % +-
-
 operatorBtns.forEach((button) => {
   button.addEventListener("click", (e) => {
     const operatorPressed = e.target.getAttribute("data-value");
-
     operatorFunction(operatorPressed);
-    if (
-      operatorPressed !== "plusminus" &&
-      operatorPressed !== "erase" &&
-      operatorPressed !== "clear" &&
-      operatorPressed !== "equal" &&
-      numberOnScreen !== ""
-    )
-      e.target.classList.add("btn-highlight");
   });
 });
 
@@ -110,6 +95,10 @@ function operatorFunction(operatorPressed) {
 
     lastActionWasEqual = 0;
     lastActionWasOperator = 1;
+
+    document
+      .querySelector(`[data-value=${operatorPressed}]`)
+      .classList.add("btn-highlight");
   }
 }
 
@@ -132,8 +121,6 @@ function numberFunction(numberPressed) {
     lastActionWasOperator = 0;
 
     if (currentCalc.num1) {
-      // prevent NaN/undefined issue, caused by choosing
-      // an operator & immediately clearing afterward
       currentCalc.generatePartialExpression();
       updateHistory(currentCalc.expressionPartial);
     }
@@ -142,7 +129,7 @@ function numberFunction(numberPressed) {
   }
 
   if (lastActionWasEqual === 1) {
-    // occurs if a user isn't chaining multiple calculations together
+    // occurs when a user isn't chaining multiple calculations together
     lastActionWasEqual = 0;
     clearAll();
   }
@@ -150,7 +137,7 @@ function numberFunction(numberPressed) {
   // prevent multiple prefixing zero's (0001, 000302)
   if (numberPressed === "0" && numberOnScreen.match(/^0$/g)) return;
 
-  // prevent prefixing zero if a decimal isn't present after it
+  // prevent prefixing zero if a decimal isn't present after it (0100, 0511)
   if (numberOnScreen.match(/^0$/g) && numberPressed !== ".") updateScreen("");
 
   // prevent multiple decimal dots in a single number
@@ -173,6 +160,7 @@ function expression(operator, num1, num2) {
   // operate method
   this.operate = function () {
     if (this.operator === "divide" && this.num2 === 0) {
+      alert("Dividing numbers by zero is a no no.");
       return 1;
     }
     this.answer = roundNumber(window[this.operator](this.num1, this.num2), 5);
