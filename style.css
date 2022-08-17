@@ -59,6 +59,7 @@ section {
 
 .calculator {
   display: flex;
+  max-width: 21rem;
   flex-direction: column;
   padding: 1rem;
   margin-inline: auto;
@@ -76,6 +77,7 @@ section {
 
 .display,
 .history {
+  overflow: hidden;
   display: flex;
   justify-content: flex-end;
   align-items: center;
