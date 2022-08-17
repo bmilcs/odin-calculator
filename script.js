@@ -25,7 +25,7 @@ let lastActionWasEqual;
 window.addEventListener("keyup", (e) => {
   const keyPressed = e.key || e.keyCode;
 
-  if (keyPressed.match(/[\d.]/)) {
+  if (keyPressed.match(/^[\d.]$/)) {
     numberFunction(keyPressed);
   } else if (keyPressed === "-") operatorFunction("subtract");
   else if (keyPressed === "+") operatorFunction("add");
