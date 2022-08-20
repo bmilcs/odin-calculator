@@ -19,7 +19,7 @@ Welcome to Bryan Miller's Calculator Project, the [fifth assignment](https://www
 
 ## Screenshots
 
-<!-- ![Desktop screenshot]() -->
+![Desktop](./img/desktop.png)
 
 ## Deployment
 
