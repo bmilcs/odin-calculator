@@ -15,7 +15,7 @@ Welcome to Bryan Miller's Calculator Project, the [fifth assignment](https://www
 # Links
 
 - [Live Demo](https://bmilcs.github.io/odin-calculator/)
-- [My Odin Project Progress](https://github.com/bmilcs/op)
+- [My Odin Project Progress](https://github.com/bmilcs/odin-project)
 
 ## Screenshots
 
